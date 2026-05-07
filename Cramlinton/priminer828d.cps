@@ -16,7 +16,7 @@ if (!description) {
   description = "Siemens SINUMERIK Mill";
 }
 vendor = "Siemens";
-vendorUrl = "http://www.siemens.com";
+vendorUrl = "https://www.priminer.de/en";
 legal = "Copyright (C) 2012-2026 by Autodesk, Inc.";
 certificationLevel = 2;
 minimumRevision = 45917;
