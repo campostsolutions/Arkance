@@ -326,7 +326,7 @@ var settings = {
       {id:COOLANT_AIR_THROUGH_TOOL, on:35},
       {id:COOLANT_SUCTION},
       {id:COOLANT_FLOOD_MIST},
-      {id:COOLANT_FLOOD_THROUGH_TOOL, on:[8, 36]},
+      {id:COOLANT_FLOOD_THROUGH_TOOL},
       {id:COOLANT_OFF, off:9}
     ],
     singleLineCoolant: false, // specifies to output multiple coolant codes in one line rather than in separate lines
@@ -576,7 +576,7 @@ function onSection() {
 
   writeln("");
   var comment = formatComment(getParameter("operation-comment", "")).replace(settings.comments.prefix, "");
-  writeBlock(comment ? "MSG (" + "\"" + comment + "\"" + ")" : "");
+  writeln(comment ? "MSG (" + "\"" + comment + "\"" + ")" : "");
 
   if (getProperty("showNotes")) {
     writeSectionNotes();
@@ -2494,57 +2494,30 @@ properties.writeTools = {
   description: "Output a tool list in the header of the program.",
   group      : "formats",
   type       : "boolean",
-  value      : false,
+  value      : true,
   scope      : "post"
 };
-function getGlobalParameterSafe(name) {
-  try {
-    return getGlobalParameter(name);
-  } catch (error) {
-    return "";
-  }
-}
-
 function writeProgramHeader() {
   // dump machine configuration
   var vendor = machineConfiguration.getVendor();
   var model = machineConfiguration.getModel();
   var mDescription = machineConfiguration.getDescription();
   
+  if (getProperty("writeMachine") && (vendor || model || mDescription)) {
+    writeComment(localize("Machine"));
+    if (vendor) {
+      writeComment("  " + localize("vendor") + ": " + vendor);
+    }
+    if (model) {
+      writeComment("  " + localize("model") + ": " + model);
+    }
+    if (mDescription) {
+      writeComment("  " + localize("description") + ": " + mDescription);
+    }
+  }
 
-if (getProperty("writeMachine") && (vendor || model || mDescription)) {
-writeComment("*******************************************************");
-writeComment("*****                 PROGRAM INFO                *****");
-writeComment("*******************************************************");
-writeComment("PROGRAM NAME     : " + (typeof programName !== "undefined" ? programName : ""));
-writeComment("PROGRAM COMMENT  : " + (typeof programComment !== "undefined" ? programComment : ""));
-writeComment("PART NAME        : " + getGlobalParameterSafe("document-path"));
-writeComment("PART NUMBER      : " + getGlobalParameterSafe("part-number"));
-writeComment("ISSUE / REVISION : " + getGlobalParameterSafe("issue-revision"));
-writeComment("PROGRAMMER       : " + getGlobalParameterSafe("username"));
-writeComment("DATE CREATED     : " + getGlobalParameterSafe("generated-at"));
-writeComment("SOFTWARE         : " + getGlobalParameterSafe("generated-by"));
-writeComment("POST             : " + localize("Priminer 828D"));
-writeComment("POST VERSION     : " + localize("10.0"));
-writeComment("MACHINE          : " + vendor + " " + model + " " + mDescription);
-writeComment("PROGRAM STATE    : " + localize("UNPROVEN"));
-writeComment("*******************************************************");
-writeComment(" ");
+  writeComment("POST VERSION     : " + localize("10.1"));
 
-writeComment("DEF INT RETURNCODE");
-writeComment("DEF STRING[128] RESULTSFILE");
-writeComment("DEF STRING[128] OUTPUT");
-writeComment("DEF REAL INSPTOL")
-}
-
-
-
-
-
-
-
-
-  
   // dump tool information
   if (getProperty("writeTools")) {
     if (false) { // set to true to use the post kernel version of the tool list
